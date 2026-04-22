@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychology Mastery - Solo Challenge</title>
+<style>
+    /* Global Styles & Layout */
+    html {
+        font-size: clamp(14px, 2.5vh, 28px); 
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f0f4f8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+        margin: 0;
+        overflow: hidden;
+        color: #333;
+    }
+
+    /* Start Screen Layout */
+    .start-container {
+        background-color: #ffffff;
+        padding: 3vh 3vw;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        width: 90vw;
+        max-width: 900px;
+        text-align: center;
+        box-sizing: border-box;
+    }
+    
+    .start-container h1 {
+        color: #0078d7;
+        margin: 0;
+        font-size: 2.2rem;
+    }
+    .high-score-display {
+        font-size: 1.1rem;
+        color: #28a745;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+    .setting-group {
+        margin-bottom: 2vh;
+        text-align: left;
+        background: #f8f9fa;
+        padding: 2vh 2vw;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+    .setting-group h3 {
+        margin: 0 0 1.5vh 0;
+        font-size: 1.2rem;
+        color: #333;
+    }
+    .btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1vh 1vw;
+    }
+    .toggle-btn, .radio-btn {
+        background-color: #e2e6ea;
+        color: #495057;
+        border: 2px solid transparent;
+        padding: 1vh 1.2vw;
+        font-size: 0.85rem;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        flex: 1;
+        min-width: 30%;
+    }
+    .toggle-btn.active, .radio-btn.active {
+        background-color: #0078d7;
+        color: white;
+        border-color: #005a9e;
+    }
+    .start-battle-btn {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 2vh;
+        font-size: 1.5rem;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    /* Game Screen */
+    #gameScreen {
+        display: none;
+        grid-template-columns: 1fr 1.5fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 2vh 2vw;
+        width: 100vw;
+        height: 100vh;
+        padding: 2vh 2vw;
+        box-sizing: border-box;
+    }
+
+    .center-ui {
+        grid-column: 2 / 3;
+        grid-row: 1 / 3;
+        display: flex;
+        flex-direction: column;
+        background-color: #ffffff;
+        padding: 2vh 2vw;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        text-align: center;
+        justify-content: center;
+    }
+
+    .header-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2vh;
+    }
+    .timer-text {
+        color: #dc3545;
+        font-weight: 800;
+        font-size: 1.5rem;
+        background-color: #f8d7da;
+        padding: 0.5vh 1vw;
+        border-radius: 8px;
+    }
+    .score-banner {
+        font-size: 1.8rem;
+        font-weight: 900;
+        color: #0078d7;
+        margin-bottom: 1vh;
+    }
+    
+    .flashcard {
+        background-color: #0078d7;
+        color: white;
+        padding: 3vh 2vw;
+        border-radius: 8px;
+        font-size: 1.3rem;
+        margin-bottom: 1vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-grow: 1;
+    }
+    .feedback {
+        font-weight: bold;
+        font-size: 1.4rem;
+        min-height: 4vh;
+    }
+
+    .corner-container { display: flex; align-items: stretch; justify-content: stretch; }
+    .top-left { grid-column: 1 / 2; grid-row: 1 / 2; }
+    .top-right { grid-column: 3 / 4; grid-row: 1 / 2; }
+    .bottom-left { grid-column: 1 / 2; grid-row: 2 / 3; }
+    .bottom-right { grid-column: 3 / 4; grid-row: 2 / 3; }
+
+    .option-btn {
+        width: 100%;
+        background-color: #ffffff;
+        border: 4px solid #e0e0e0;
+        padding: 2vh 1vw;
+        font-size: clamp(12px, 1.8vh, 18px);
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+    .option-btn:hover:not(:disabled) { border-color: #0078d7; transform: scale(1.02); }
+    
+    .correct { background-color: #d4edda !important; border-color: #28a745 !important; }
+    .incorrect { background-color: #f8d7da !important; border-color: #dc3545 !important; }
+    .restart-btn {
+        background-color: #28a745;
+        color: white;
+        padding: 2vh;
+        font-size: 1.4rem;
+        border-radius: 8px;
+        cursor: pointer;
+        border: none;
+        width: 100%;
+    }
+</style>
+</head>
+<body>
+
+<div class="start-container" id="startScreen">
+    <h1>Psychology Mastery</h1>
+    <div class="high-score-display" id="highScoreText">Personal Best: 0</div>
+    
+    <div class="setting-group">
+        <h3>1. Topics</h3>
+        <div class="btn-group" id="aimsGroup">
+            <button class="toggle-btn active" data-aim="Behaviour" onclick="toggleAim(this)">Behaviour</button>
+            <button class="toggle-btn active" data-aim="Other Theories of Behaviour" onclick="toggleAim(this)">Other Theories</button>
+            <button class="toggle-btn active" data-aim="Obedience Theories" onclick="toggleAim(this)">Obedience</button>
+            <button class="toggle-btn active" data-aim="Theories Related to Stress" onclick="toggleAim(this)">Stress Theories</button>
+        </div>
+    </div>
+
+    <div class="setting-group">
+        <h3>2. Question Count</h3>
+        <div class="btn-group" id="qGroup">
+            <button class="radio-btn" onclick="selectQ(10, this)">10 Questions</button>
+            <button class="radio-btn active" onclick="selectQ(20, this)">20 Questions</button>
+            <button class="radio-btn" onclick="selectQ(30, this)">30 Questions</button>
+            <button class="radio-btn" onclick="selectQ(999, this)">All Questions</button>
+        </div>
+    </div>
+
+    <div class="setting-group">
+        <h3>3. Difficulty (Timer)</h3>
+        <div class="btn-group" id="timeGroup">
+		<button class="radio-btn" onclick="selectTime(30, this)">Zen (30s)</button>
+            	<button class="radio-btn" onclick="selectTime(15, this)">Relaxed (15s)</button>
+            	<button class="radio-btn active" onclick="selectTime(10, this)">Normal (10s)</button>
+            	<button class="radio-btn" onclick="selectTime(5, this)">Blitz (5s)</button>
+        </div>
+    </div>
+
+    <button class="start-battle-btn" onclick="startGame()">Start Training</button>
+</div>
+
+<div id="gameScreen">
+    <div id="corner-0" class="corner-container top-left"></div>
+    <div class="center-ui">
+        <div class="header-info">
+            <span id="questionCounter">Q 1/10</span>
+            <span id="timerDisplay" class="timer-text">⏳ --s</span>
+        </div>
+        <div class="score-banner" id="currentScoreDisplay">Score: 0</div>
+        <div class="flashcard" id="questionText">Loading...</div>
+        <div class="feedback" id="feedbackText"></div>
+        <div id="playAgainContainer"></div> 
+    </div>
+    <div id="corner-1" class="corner-container top-right"></div>
+    <div id="corner-2" class="corner-container bottom-left"></div>
+    <div id="corner-3" class="corner-container bottom-right"></div>
+</div>
+
+<script>
+    const flashcardsMaster = [
+        { aim: "Behaviour", q: "Behaviourist Approach?", a: "Human and animal behaviour can be explained through the use of conditioning. Thoughts and feelings are not considered to influence behaviour and neither do inherited factors." },
+        { aim: "Behaviour", q: "Classical Conditioning?", a: "The use of a familiar stimulus to influence behaviour towards a new stimulus by repeatedly pairing them together. E.g. Pavlov's dog." },
+        { aim: "Behaviour", q: "Operant Conditioning?", a: "The use of reinforcement, both positive and negative, to influence how new behaviours are learnt and how old behaviours are modified. E.g. the Skinner Box." },
+        { aim: "Behaviour", q: "Positive Reinforcement?", a: "Use positive reinforcement or reward following a particular behaviour to reinforce learning to ensure that the outcome is repeated." },
+        { aim: "Behaviour", q: "What is Negative Reinforcement?", a: "The removal of an unfavourable outcome." },
+        { aim: "Behaviour", q: "What is a Stimulus?", a: "A thing or event that causes an individual to react." },
+        { aim: "Behaviour", q: "What is Social Learning Theory?", a: "Individuals learn from observing others, imitating and modelling. E.g. Bandura's Bobo Doll." },
+        { aim: "Behaviour", q: "What is the Psychodynamic approach?", a: "Behaviour is explained by unconscious thoughts and emotions. E.g. Sigmund Freud's iceberg analogy." },
+        { aim: "Behaviour", q: "What is Conscious Thinking?", a: "The experiences of the senses in the here and now." },
+        { aim: "Behaviour", q: "What is the Subconscious Mind?", a: "The easily accessible part of the mind that stores experiences, memories and skills." },
+        { aim: "Behaviour", q: "What is  the Unconscious Mind?", a: "The bank of memories, thoughts and urges that individuals are not readily aware of." },
+        { aim: "Behaviour", q: "What is  the Id?", a: "Primitive and instinctual part of the mind." },
+        { aim: "Behaviour", q: "What is  the Ego?", a: "Realistic part of the mind operating in the real world." },
+        { aim: "Behaviour", q: "What is  the Superego?", a: "The moral thermometer within the mind." },
+        { aim: "Behaviour", q: "What is  the Humanistic approach?", a: "Individuals operate on their own free will and are able to choose how they act." },
+        { aim: "Behaviour", q: "In relation to Maslow, what does the Self-actualization step on the pyramid fulfil?", a: "When an individual can appreciate that they have reached their full potential. E.g. Maslow's Hierarchy of Needs." },
+        { aim: "Behaviour", q: "Free-will.", a: "The ability to choose between different courses of action." },
+        { aim: "Behaviour", q: "In relation to Maslow, what does the Physiological needs step on the pyramid fulfil?.", a: "Needs that must be met for survival, including food and water." },
+        { aim: "Behaviour", q: "In relation to Maslow, what does the Safety needs step on the pyramid fulfil?", a: "Needs that must be met for ensuring a person feels secure and safe - usually related to having housing or not being in a dangerous area" },
+        { aim: "Behaviour", q: "In relation to Maslow, what does the Relationship needs step on the pyramid fulfil??", a: "Needs that must be met for ensuring a person has a sense of belonging and love from others." },
+        { aim: "Behaviour", q: "In relation to Maslow, what does the Esteem needs step on the pyramid fulfil?", a: "Needs that must be met for a person to feel they have respect in themselves and others" },
+        { aim: "Behaviour", q: "What is the Cognitive approach?", a: "This theory attempts to explain behaviour by reviewing the thought processes used by the brain in reaching decisions." },
+        { aim: "Behaviour", q: "What is a Cognitive processes?", a: "The ability to remember, pay attention and problem solve." },
+        { aim: "Behaviour", q: "What is Experimental cognitive psychology?", a: "When Cognitive Psychologists use information as a stimulus so that they can identify how it appears in the brain." },
+        { aim: "Other Theories of Behaviour", q: "What is the TYPE A and TYPE B Personality Theory?", a: "This approach groups all personality traits as either Type A or Type B." },
+        { aim: "Other Theories of Behaviour", q: "What is a TYPE A personality?", a: "People with a TYPE A personality have a strong urge for competition and a high desire to achieve goals. They tend to lack tolerance towards others and experience higher levels of anxiety." },
+        { aim: "Other Theories of Behaviour", q: "What is a TYPE B Personality?", a: "TYPE B personalities tend to be more tolerant towards others, experience lower levels of anxiety and display higher levels of imagination and creativity." },
+        { aim: "Other Theories of Behaviour", q: "What is Trait theory?", a: "Individuals have certain characteristics that explain their patterns of behaviour." },
+        { aim: "Other Theories of Behaviour", q: "What is a Trait?", a: "An identifying characteristic." },
+        { aim: "Other Theories of Behaviour", q: "What is a Extrovert?", a: "Outgoing and socially confident." },
+        { aim: "Other Theories of Behaviour", q: "What is a Introvert?", a: "Shy and quiet." },
+        { aim: "Other Theories of Behaviour", q: "What is Situational theory?", a: "The situational approach is different from the trait theory approach as it says that behaviour is dependent on the current situation or environment. E.g. Zimbardo's Stanford Prison experiment, 1971." },
+        { aim: "Other Theories of Behaviour", q: "What is the Theory of Planned Behaviour?", a: "This theory links the beliefs an individual holds, to the likelihood that they will behave in a certain way." },
+        { aim: "Other Theories of Behaviour", q: "What is a Behavioural Intention?", a: "The perceived likelihood of a person carrying out this behaviour." },
+        { aim: "Other Theories of Behaviour", q: "What is Attitude?", a: "A person's individual feelings and evaluation of the behaviour." },
+        { aim: "Other Theories of Behaviour", q: "What is a Subjective norm?", a: "How others in society view this behaviour." },
+        { aim: "Other Theories of Behaviour", q: "What is Perceived behavioural control?", a: "The individual belief that one has control over a specific action or behaviour." },
+        { aim: "Other Theories of Behaviour", q: "What is Mindset Theory?", a: "The mindset theory is based on the idea of the existence of two different types of mindset; the fixed mindset and the growth mindset." },
+        { aim: "Other Theories of Behaviour", q: "What is a Fixed mindset?", a: "Individuals who believe their qualities are fixed and cannot change." },
+        { aim: "Other Theories of Behaviour", q: "What is a Growth mindset?", a: "Individuals who thrive on a challenge and are always eager to learn more." },
+        { aim: "Obedience Theories", q: "What is Obedience?", a: "Following an order or request. E.g. Milgram's electric shock experiment, Burger replicating Milgram, and Hofling's Hospital Experiment." },
+        { aim: "Obedience Theories", q: "What is Conformity?", a: "When an individual changes their behaviour to fit in with a group. E.g. Zimbardo's Stanford Prison experiment, Asch's paradigm." },
+        { aim: "Obedience Theories", q: "What is Compliance?", a: "When an individual changes their behaviour because they are requested to do so." },
+        { aim: "Obedience Theories", q: "What is a Authority Figure?", a: "A person whose command over others inspires or demands obedience." },
+        { aim: "Obedience Theories", q: "What is Conscious obedience?", a: "The individual is aware that they are actively obeying instructions or rules, by making a deliberate and informed choice." },
+        { aim: "Obedience Theories", q: "What is Unconscious obedience?", a: "The individual follows the rules without thinking about it because it has become a part of their work routine, habit, or routine behaviour." },
+        { aim: "Obedience Theories", q: "What is Blind obedience?", a: "The individual does as they are told without question, regardless of the consequences or ethical implications." },
+        { aim: "Theories Related to Stress", q: "What is the Stress-vulnerability model?", a: "The aim of this model is to address the issue of why some people develop psychiatric disorders when others do not." },
+        { aim: "Theories Related to Stress", q: "What is Biological Vulnerability?", a: "More likely to suffer from a particular illness such as asthma or heart disease." },
+        { aim: "Theories Related to Stress", q: "What is Stress?", a: "The feeling of being overwhelmed or unable to cope with mental or emotional pressure." },
+        { aim: "Theories Related to Stress", q: "What are Coping skills?", a: "Developing coping strategies can help with handling stress and reducing its negative effects on vulnerability." },
+        { aim: "Theories Related to Stress", q: "What is General Adaptation Syndrome?", a: "This explains the different stages of stress, which are important in understanding how to manage it by spotting the early warning signs." },
+        { aim: "Theories Related to Stress", q: "What is the Alarm Reaction Stage?", a: "Initial reaction of the body in 'fight or flight' mode to stress." },
+        { aim: "Theories Related to Stress", q: "What is the Resistance Stage?", a: "Body remains on high alert, producing hormones to react to stress." },
+        { aim: "Theories Related to Stress", q: "What is the Exhaustion Stage?", a: "Body becomes exhausted by continued reaction to stress." },
+        { aim: "Theories Related to Stress", q: "What is Adaptation in relation to stress?", a: "Changing to better manage a stressful situation." },
+        { aim: "Theories Related to Stress", q: "What is Coping in relation to stress?", a: "To attempt to overcome a problem." },
+        { aim: "Theories Related to Stress", q: "What is the Betari Box Theory?", a: "The Betari Box theory links attitude and behaviour in a circular diagram to help individuals understand how they impact others." }
+    ];
+
+    let selectedAims = ["Behaviour", "Other Theories of Behaviour", "Obedience Theories", "Theories Related to Stress"];
+    let selectedQuestionsLimit = 20;
+    let selectedTimeLimit = 10;
+    let availableQuestions = []; 
+    let score = 0;
+    let totalQuestionsToPlay = 0;
+    let currentQuestionIdx = 0;
+    let acceptingAnswers = true;
+    let currentCorrectAnswer = "";
+    let timeLeft;
+    let timerInterval;
+
+    // Load High Score on init
+    window.onload = () => {
+        const hs = localStorage.getItem("psychHighScore") || 0;
+        document.getElementById("highScoreText").textContent = `Personal Best: ${hs}`;
+    }
+
+    function toggleAim(btn) {
+        btn.classList.toggle('active');
+        const aim = btn.dataset.aim;
+        if (selectedAims.includes(aim)) selectedAims = selectedAims.filter(a => a !== aim);
+        else selectedAims.push(aim);
+    }
+
+    function selectQ(num, btn) {
+        selectedQuestionsLimit = num;
+        document.querySelectorAll('#qGroup .radio-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function selectTime(time, btn) {
+        selectedTimeLimit = time;
+        document.querySelectorAll('#timeGroup .radio-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function startGame() {
+        if (selectedAims.length === 0) return alert("Select a topic!");
+        const filtered = flashcardsMaster.filter(card => selectedAims.includes(card.aim));
+        
+        totalQuestionsToPlay = Math.min(selectedQuestionsLimit, filtered.length);
+        availableQuestions = filtered.sort(() => Math.random() - 0.5).slice(0, totalQuestionsToPlay);
+        
+        currentQuestionIdx = 0;
+        score = 0;
+        
+        document.getElementById("startScreen").style.display = "none";
+        document.getElementById("gameScreen").style.display = "grid"; 
+        loadNewQuestion();
+    }
+
+    function loadNewQuestion() {
+        if (currentQuestionIdx >= totalQuestionsToPlay) return endGame();
+
+        acceptingAnswers = true;
+        document.getElementById("feedbackText").textContent = "";
+        document.getElementById("questionCounter").textContent = `Q ${currentQuestionIdx + 1} / ${totalQuestionsToPlay}`;
+        document.getElementById("currentScoreDisplay").textContent = `Score: ${score}`;
+
+        const currentQ = availableQuestions[currentQuestionIdx];
+        currentCorrectAnswer = currentQ.a;
+        document.getElementById("questionText").textContent = currentQ.q;
+
+        let wrongPool = flashcardsMaster.filter(card => card.aim === currentQ.aim && card.a !== currentCorrectAnswer);
+        if (wrongPool.length < 3) wrongPool = flashcardsMaster.filter(card => card.a !== currentCorrectAnswer);
+
+        wrongPool = wrongPool.sort(() => 0.5 - Math.random());
+        let options = [currentCorrectAnswer, wrongPool[0].a, wrongPool[1].a, wrongPool[2].a].sort(() => 0.5 - Math.random());
+
+        for (let i = 0; i < 4; i++) {
+            const corner = document.getElementById(`corner-${i}`);
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = options[i];
+            btn.onclick = () => checkAnswer(btn, options[i]);
+            corner.innerHTML = '';
+            corner.appendChild(btn);
+        }
+        startTimer();
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timeLeft = selectedTimeLimit;
+        const disp = document.getElementById("timerDisplay");
+        disp.textContent = `⏳ ${timeLeft}s`;
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            disp.textContent = `⏳ ${timeLeft}s`;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                handleTimeOut();
+            }
+        }, 1000);
+    }
+
+    function handleTimeOut() {
+        if (!acceptingAnswers) return;
+        acceptingAnswers = false;
+        document.getElementById("feedbackText").textContent = "Too slow!";
+        document.getElementById("feedbackText").style.color = "#dc3545";
+        highlightCorrectAnswer();
+        setTimeout(() => {
+            currentQuestionIdx++;
+            loadNewQuestion();
+        }, 2000);
+    }
+
+    function checkAnswer(btn, choice) {
+        if (!acceptingAnswers) return;
+        acceptingAnswers = false;
+        clearInterval(timerInterval);
+        
+        const correct = (choice === currentCorrectAnswer);
+        const fb = document.getElementById("feedbackText");
+
+        if (correct) {
+            btn.classList.add("correct");
+            // Bonus points for speed
+            const pointsGained = 10 + timeLeft; 
+            score += pointsGained;
+            fb.textContent = `Correct! +${pointsGained}`;
+            fb.style.color = "#28a745";
+            setTimeout(() => {
+                currentQuestionIdx++;
+                loadNewQuestion();
+            }, 1200);
+        } else {
+            btn.classList.add("incorrect");
+            fb.textContent = "Incorrect!";
+            fb.style.color = "#dc3545";
+            highlightCorrectAnswer();
+            setTimeout(() => {
+                currentQuestionIdx++;
+                loadNewQuestion();
+            }, 2000);
+        }
+        document.getElementById("currentScoreDisplay").textContent = `Score: ${score}`;
+    }
+
+    function highlightCorrectAnswer() {
+        document.querySelectorAll('.option-btn').forEach(b => {
+            if (b.textContent === currentCorrectAnswer) b.classList.add("correct");
+        });
+    }
+
+    function endGame() {
+        clearInterval(timerInterval);
+        const fb = document.getElementById("feedbackText");
+        document.getElementById("questionText").textContent = "CHALLENGE COMPLETE";
+        document.getElementById("questionText").style.backgroundColor = "#333";
+        
+        const lastHigh = localStorage.getItem("psychHighScore") || 0;
+        let finalMsg = `Final Score: ${score}`;
+        
+        if (score > lastHigh) {
+            localStorage.setItem("psychHighScore", score);
+            finalMsg = `NEW HIGH SCORE: ${score}!`;
+        }
+
+        fb.innerHTML = finalMsg;
+        document.getElementById("playAgainContainer").innerHTML = '<button class="restart-btn" onclick="location.reload()">Try Again</button>';
+    }
+</script>
+</body>
+</html>
