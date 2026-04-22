@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Psychology & Behaviour - Team Battle</title>
+<title>Psychology Mastery - Solo Challenge</title>
 <style>
     /* Global Styles & Layout */
     html {
@@ -40,10 +40,11 @@
         margin: 0;
         font-size: 2.2rem;
     }
-    .start-container p.subtitle {
-        font-size: 1.2rem;
-        color: #555;
-        margin: 2vh 0;
+    .high-score-display {
+        font-size: 1.1rem;
+        color: #28a745;
+        font-weight: bold;
+        margin-top: 5px;
     }
     .setting-group {
         margin-bottom: 2vh;
@@ -67,20 +68,19 @@
         background-color: #e2e6ea;
         color: #495057;
         border: 2px solid transparent;
-        padding: 1.5vh 1.5vw;
-        font-size: 0.9rem;
+        padding: 1vh 1.2vw;
+        font-size: 0.85rem;
         font-weight: bold;
         border-radius: 8px;
         cursor: pointer;
         transition: all 0.2s;
         flex: 1;
-        min-width: 45%;
+        min-width: 30%;
     }
     .toggle-btn.active, .radio-btn.active {
         background-color: #0078d7;
         color: white;
         border-color: #005a9e;
-        box-shadow: 0 4px 6px rgba(0, 120, 215, 0.3);
     }
     .start-battle-btn {
         background-color: #28a745;
@@ -91,13 +91,10 @@
         font-weight: bold;
         border-radius: 8px;
         cursor: pointer;
-        transition: background-color 0.2s;
-        margin-top: 1vh;
         width: 100%;
     }
-    .start-battle-btn:hover { background-color: #218838; }
 
-    /* Game Screen Grid Layout */
+    /* Game Screen */
     #gameScreen {
         display: none;
         grid-template-columns: 1fr 1.5fr 1fr;
@@ -127,35 +124,24 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 2vh;
-        font-weight: bold;
     }
     .timer-text {
         color: #dc3545;
         font-weight: 800;
         font-size: 1.5rem;
         background-color: #f8d7da;
-        padding: 1vh 1.5vw;
+        padding: 0.5vh 1vw;
         border-radius: 8px;
-        border: 2px solid #dc3545;
     }
-    .turn-indicator {
+    .score-banner {
         font-size: 1.8rem;
         font-weight: 900;
-        margin-bottom: 2vh;
+        color: #0078d7;
+        margin-bottom: 1vh;
     }
-    .scores {
-        display: flex;
-        justify-content: space-around;
-        background: #f8f9fa;
-        padding: 1.5vh;
-        border-radius: 8px;
-        margin-bottom: 2vh;
-    }
-    .team-score { font-size: 1.4rem; font-weight: bold; }
-    .team-a-text { color: #0078d7; }
-    .team-b-text { color: #d75a00; }
     
     .flashcard {
+        background-color: #0078d7;
         color: white;
         padding: 3vh 2vw;
         border-radius: 8px;
@@ -165,13 +151,11 @@
         align-items: center;
         justify-content: center;
         flex-grow: 1;
-        line-height: 1.4;
     }
     .feedback {
         font-weight: bold;
         font-size: 1.4rem;
         min-height: 4vh;
-        margin-top: 1vh;
     }
 
     .corner-container { display: flex; align-items: stretch; justify-content: stretch; }
@@ -188,24 +172,20 @@
         font-size: clamp(12px, 1.8vh, 18px);
         border-radius: 12px;
         cursor: pointer;
-        transition: all 0.2s ease;
         font-weight: 600;
-        display: flex;
-        justify-content: center;
-        align-items: center;
     }
     .option-btn:hover:not(:disabled) { border-color: #0078d7; transform: scale(1.02); }
     
-    .correct { background-color: #d4edda !important; border-color: #28a745 !important; color: #155724; }
-    .incorrect { background-color: #f8d7da !important; border-color: #dc3545 !important; color: #721c24; }
+    .correct { background-color: #d4edda !important; border-color: #28a745 !important; }
+    .incorrect { background-color: #f8d7da !important; border-color: #dc3545 !important; }
     .restart-btn {
         background-color: #28a745;
         color: white;
-        border: none;
-        padding: 2vh 2vw;
+        padding: 2vh;
         font-size: 1.4rem;
         border-radius: 8px;
         cursor: pointer;
+        border: none;
         width: 100%;
     }
 </style>
@@ -213,11 +193,11 @@
 <body>
 
 <div class="start-container" id="startScreen">
-    <h1>Psychology & Behaviour Battle</h1>
-    <p class="subtitle">Correct category filtering enabled: Hard Mode!</p>
+    <h1>Psychology Mastery</h1>
+    <div class="high-score-display" id="highScoreText">Personal Best: 0</div>
     
     <div class="setting-group">
-        <h3>1. Included Topics</h3>
+        <h3>1. Topics</h3>
         <div class="btn-group" id="aimsGroup">
             <button class="toggle-btn active" data-aim="Behaviour" onclick="toggleAim(this)">Behaviour</button>
             <button class="toggle-btn active" data-aim="Other Theories of Behaviour" onclick="toggleAim(this)">Other Theories</button>
@@ -227,38 +207,35 @@
     </div>
 
     <div class="setting-group">
-        <h3>2. Questions Per Team</h3>
+        <h3>2. Question Count</h3>
         <div class="btn-group" id="qGroup">
-            <button class="radio-btn" onclick="selectQ(5, this)">5 Each</button>
-            <button class="radio-btn active" onclick="selectQ(10, this)">10 Each</button>
-            <button class="radio-btn" onclick="selectQ(15, this)">15 Each</button>
+            <button class="radio-btn" onclick="selectQ(10, this)">10 Questions</button>
+            <button class="radio-btn active" onclick="selectQ(20, this)">20 Questions</button>
+            <button class="radio-btn" onclick="selectQ(30, this)">30 Questions</button>
+            <button class="radio-btn" onclick="selectQ(999, this)">All Questions</button>
         </div>
     </div>
 
     <div class="setting-group">
-        <h3>3. Time Limit</h3>
+        <h3>3. Difficulty (Timer)</h3>
         <div class="btn-group" id="timeGroup">
-            <button class="radio-btn" onclick="selectTime(10, this)">10s</button>
-            <button class="radio-btn active" onclick="selectTime(15, this)">15s</button>
-            <button class="radio-btn" onclick="selectTime(20, this)">20s</button>
+            <button class="radio-btn" onclick="selectTime(15, this)">Relaxed (15s)</button>
+            <button class="radio-btn active" onclick="selectTime(10, this)">Normal (10s)</button>
+            <button class="radio-btn" onclick="selectTime(5, this)">Blitz (5s)</button>
         </div>
     </div>
 
-    <button class="start-battle-btn" onclick="startGame()">Start Battle!</button>
+    <button class="start-battle-btn" onclick="startGame()">Start Training</button>
 </div>
 
 <div id="gameScreen">
     <div id="corner-0" class="corner-container top-left"></div>
     <div class="center-ui">
         <div class="header-info">
-            <span id="questionCounter">Question 1</span>
+            <span id="questionCounter">Q 1/10</span>
             <span id="timerDisplay" class="timer-text">⏳ --s</span>
         </div>
-        <div class="turn-indicator" id="turnIndicator">Team A</div>
-        <div class="scores">
-            <div class="team-score team-a-text">Team A: <span id="scoreA">0</span></div>
-            <div class="team-score team-b-text">Team B: <span id="scoreB">0</span></div>
-        </div>
+        <div class="score-banner" id="currentScoreDisplay">Score: 0</div>
         <div class="flashcard" id="questionText">Loading...</div>
         <div class="feedback" id="feedbackText"></div>
         <div id="playAgainContainer"></div> 
@@ -288,9 +265,9 @@
         { aim: "Behaviour", q: "In relation to Maslow, what does the Self-actualization step on the pyramid fulfil?.", a: "When an individual can appreciate that they have reached their full potential. E.g. Maslow's Hierarchy of Needs." },
         { aim: "Behaviour", q: "Free-will.", a: "The ability to choose between different courses of action." },
         { aim: "Behaviour", q: "In relation to Maslow, what does the Physiological needs step on the pyramid fulfil?.", a: "Needs that must be met for survival, including food and water." },
-	{ aim: "Behaviour", q: "In relation to Maslow, what does the Safety needs step on the pyramid fulfil?.", a: "Needs that must be met for ensuring a person feels secure and safe - usually related to having housing or not being in a dangerous area" },
-	{ aim: "Behaviour", q: "In relation to Maslow, what does the Relationship needs step on the pyramid fulfil?.", a: "Needs that must be met for ensuring a person has a sense of belonging and love from others." },
-	{ aim: "Behaviour", q: "In relation to Maslow, what does the Esteem needs step on the pyramid fulfil?.", a: "Needs that must be met for a person to feel they have respect in themselves and others" },
+        { aim: "Behaviour", q: "In relation to Maslow, what does the Safety needs step on the pyramid fulfil?.", a: "Needs that must be met for ensuring a person feels secure and safe - usually related to having housing or not being in a dangerous area" },
+        { aim: "Behaviour", q: "In relation to Maslow, what does the Relationship needs step on the pyramid fulfil?.", a: "Needs that must be met for ensuring a person has a sense of belonging and love from others." },
+        { aim: "Behaviour", q: "In relation to Maslow, what does the Esteem needs step on the pyramid fulfil?.", a: "Needs that must be met for a person to feel they have respect in themselves and others" },
         { aim: "Behaviour", q: "Cognitive approach.", a: "This theory attempts to explain behaviour by reviewing the thought processes used by the brain in reaching decisions." },
         { aim: "Behaviour", q: "Cognitive processes.", a: "The ability to remember, pay attention and problem solve." },
         { aim: "Behaviour", q: "Experimental cognitive psychology.", a: "When Cognitive Psychologists use information as a stimulus so that they can identify how it appears in the brain." },
@@ -331,18 +308,22 @@
     ];
 
     let selectedAims = ["Behaviour", "Other Theories of Behaviour", "Obedience Theories", "Theories Related to Stress"];
-    let selectedQuestionsPerTeam = 10;
-    let selectedTimeLimit = 15;
+    let selectedQuestionsLimit = 20;
+    let selectedTimeLimit = 10;
     let availableQuestions = []; 
-    let currentQuestionNumber = 1;
-    let maxQuestions = 20;
-    let scoreA = 0;
-    let scoreB = 0;
+    let score = 0;
+    let totalQuestionsToPlay = 0;
+    let currentQuestionIdx = 0;
     let acceptingAnswers = true;
-    let isStealTurn = false;
     let currentCorrectAnswer = "";
     let timeLeft;
     let timerInterval;
+
+    // Load High Score on init
+    window.onload = () => {
+        const hs = localStorage.getItem("psychHighScore") || 0;
+        document.getElementById("highScoreText").textContent = `Personal Best: ${hs}`;
+    }
 
     function toggleAim(btn) {
         btn.classList.toggle('active');
@@ -352,7 +333,7 @@
     }
 
     function selectQ(num, btn) {
-        selectedQuestionsPerTeam = num;
+        selectedQuestionsLimit = num;
         document.querySelectorAll('#qGroup .radio-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
@@ -366,38 +347,32 @@
     function startGame() {
         if (selectedAims.length === 0) return alert("Select a topic!");
         const filtered = flashcardsMaster.filter(card => selectedAims.includes(card.aim));
-        maxQuestions = Math.min(selectedQuestionsPerTeam * 2, filtered.length);
-        availableQuestions = filtered.sort(() => Math.random() - 0.5).slice(0, maxQuestions);
+        
+        totalQuestionsToPlay = Math.min(selectedQuestionsLimit, filtered.length);
+        availableQuestions = filtered.sort(() => Math.random() - 0.5).slice(0, totalQuestionsToPlay);
+        
+        currentQuestionIdx = 0;
+        score = 0;
+        
         document.getElementById("startScreen").style.display = "none";
         document.getElementById("gameScreen").style.display = "grid"; 
         loadNewQuestion();
     }
 
     function loadNewQuestion() {
-        if (availableQuestions.length === 0) return endGame();
+        if (currentQuestionIdx >= totalQuestionsToPlay) return endGame();
 
         acceptingAnswers = true;
-        isStealTurn = false;
         document.getElementById("feedbackText").textContent = "";
-        
-        const isTeamA = (maxQuestions - availableQuestions.length + 1) % 2 !== 0;
-        const turnInd = document.getElementById("turnIndicator");
-        turnInd.textContent = isTeamA ? "Team A's Turn" : "Team B's Turn";
-        turnInd.style.color = isTeamA ? "#0078d7" : "#d75a00";
-        document.getElementById("questionText").style.backgroundColor = isTeamA ? "#0078d7" : "#d75a00";
-        document.getElementById("questionCounter").textContent = `Question ${maxQuestions - availableQuestions.length + 1} / ${maxQuestions}`;
+        document.getElementById("questionCounter").textContent = `Q ${currentQuestionIdx + 1} / ${totalQuestionsToPlay}`;
+        document.getElementById("currentScoreDisplay").textContent = `Score: ${score}`;
 
-        const currentQ = availableQuestions.pop();
+        const currentQ = availableQuestions[currentQuestionIdx];
         currentCorrectAnswer = currentQ.a;
         document.getElementById("questionText").textContent = currentQ.q;
 
-        // FILTER LOGIC: Get wrong answers from the SAME aim
         let wrongPool = flashcardsMaster.filter(card => card.aim === currentQ.aim && card.a !== currentCorrectAnswer);
-        
-        // Safety check if category is too small
-        if (wrongPool.length < 3) {
-            wrongPool = flashcardsMaster.filter(card => card.a !== currentCorrectAnswer);
-        }
+        if (wrongPool.length < 3) wrongPool = flashcardsMaster.filter(card => card.a !== currentCorrectAnswer);
 
         wrongPool = wrongPool.sort(() => 0.5 - Math.random());
         let options = [currentCorrectAnswer, wrongPool[0].a, wrongPool[1].a, wrongPool[2].a].sort(() => 0.5 - Math.random());
@@ -407,7 +382,7 @@
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.textContent = options[i];
-            btn.onclick = () => checkAnswer(btn, options[i], isTeamA);
+            btn.onclick = () => checkAnswer(btn, options[i]);
             corner.innerHTML = '';
             corner.appendChild(btn);
         }
@@ -431,47 +406,46 @@
 
     function handleTimeOut() {
         if (!acceptingAnswers) return;
-        if (!isStealTurn) {
-            isStealTurn = true;
-            document.getElementById("feedbackText").textContent = "Time up! Steal attempt...";
-            startTimer();
-        } else {
-            acceptingAnswers = false;
-            highlightCorrectAnswer();
-            setTimeout(loadNewQuestion, 2000);
-        }
+        acceptingAnswers = false;
+        document.getElementById("feedbackText").textContent = "Too slow!";
+        document.getElementById("feedbackText").style.color = "#dc3545";
+        highlightCorrectAnswer();
+        setTimeout(() => {
+            currentQuestionIdx++;
+            loadNewQuestion();
+        }, 2000);
     }
 
-    function checkAnswer(btn, choice, isTeamA_Orig) {
+    function checkAnswer(btn, choice) {
         if (!acceptingAnswers) return;
+        acceptingAnswers = false;
         clearInterval(timerInterval);
+        
         const correct = (choice === currentCorrectAnswer);
         const fb = document.getElementById("feedbackText");
 
         if (correct) {
-            acceptingAnswers = false;
             btn.classList.add("correct");
-            fb.textContent = isStealTurn ? "STEAL!" : "CORRECT!";
-            if (isStealTurn) {
-                isTeamA_Orig ? scoreB++ : scoreA++;
-            } else {
-                isTeamA_Orig ? scoreA += 2 : scoreB += 2;
-            }
-            updateScores();
-            setTimeout(loadNewQuestion, 1500);
+            // Bonus points for speed
+            const pointsGained = 10 + timeLeft; 
+            score += pointsGained;
+            fb.textContent = `Correct! +${pointsGained}`;
+            fb.style.color = "#28a745";
+            setTimeout(() => {
+                currentQuestionIdx++;
+                loadNewQuestion();
+            }, 1200);
         } else {
             btn.classList.add("incorrect");
-            btn.disabled = true;
-            if (!isStealTurn) {
-                isStealTurn = true;
-                fb.textContent = "WRONG! Steal opportunity!";
-                startTimer();
-            } else {
-                acceptingAnswers = false;
-                highlightCorrectAnswer();
-                setTimeout(loadNewQuestion, 2000);
-            }
+            fb.textContent = "Incorrect!";
+            fb.style.color = "#dc3545";
+            highlightCorrectAnswer();
+            setTimeout(() => {
+                currentQuestionIdx++;
+                loadNewQuestion();
+            }, 2000);
         }
+        document.getElementById("currentScoreDisplay").textContent = `Score: ${score}`;
     }
 
     function highlightCorrectAnswer() {
@@ -480,20 +454,22 @@
         });
     }
 
-    function updateScores() {
-        document.getElementById("scoreA").textContent = scoreA;
-        document.getElementById("scoreB").textContent = scoreB;
-    }
-
     function endGame() {
         clearInterval(timerInterval);
-        const turnInd = document.getElementById("turnIndicator");
         const fb = document.getElementById("feedbackText");
-        document.getElementById("questionText").textContent = "BATTLE COMPLETE";
+        document.getElementById("questionText").textContent = "CHALLENGE COMPLETE";
         document.getElementById("questionText").style.backgroundColor = "#333";
-        turnInd.textContent = scoreA > scoreB ? "Team A Wins!" : (scoreB > scoreA ? "Team B Wins!" : "Draw!");
-        fb.textContent = `Final: ${scoreA} - ${scoreB}`;
-        document.getElementById("playAgainContainer").innerHTML = '<button class="restart-btn" onclick="location.reload()">New Battle</button>';
+        
+        const lastHigh = localStorage.getItem("psychHighScore") || 0;
+        let finalMsg = `Final Score: ${score}`;
+        
+        if (score > lastHigh) {
+            localStorage.setItem("psychHighScore", score);
+            finalMsg = `NEW HIGH SCORE: ${score}!`;
+        }
+
+        fb.innerHTML = finalMsg;
+        document.getElementById("playAgainContainer").innerHTML = '<button class="restart-btn" onclick="location.reload()">Try Again</button>';
     }
 </script>
 </body>
